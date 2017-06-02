@@ -38,17 +38,21 @@ class PriorityQueue(object):
         """
 
         self.queue = []
+        self.min_value = 0
 
 
     def pop(self):
         """Pop top priority node from queue.
+        Top priority is defined as the lowest self.current value for now.
 
         Returns:
             The node with the highest priority.
         """
-        #self.queue *= -1
-        heapq.heappop(self.queue)
-        #self.queue *= -1
+
+        nodes_sorted = sorted(self.queue)
+        popped = heapq.heappop(nodes_sorted)
+        self.queue = nodes_sorted
+        return popped
 
 
     def remove(self, node_id):
@@ -59,9 +63,7 @@ class PriorityQueue(object):
         Args:
             node_id (int): Index of node in queue.
         """
-        self.queue[node_id] = self.queue.pop()
-        print('i am checking', self.queue)
-        heapq.heapify(self.queue)
+        self.pop()
         return self.queue
 
 
@@ -83,14 +85,13 @@ class PriorityQueue(object):
         return 'PQ:%s' % self.queue
 
 
-    def append(self, node):
+    def append(self, (value, node)):
         """Append a node to the queue.
 
         Args:
             node: Comparable Object to be added to the priority queue.
         """
-        heapq.heappush(self.queue, node)
-
+        heapq.heappush(self.queue, (value, node))
 
 
     def __contains__(self, key):
@@ -164,21 +165,23 @@ def breadth_first_search(graph, start, goal):
     if start == goal:
         return []
     frontier = PriorityQueue()
-    frontier.append(start)
+
+    frontier.append((random.randint(0, 10000), start))
     explored = set()
     print('frontier.queue', frontier.queue)
     while frontier:
+        start = frontier.top()
         print(start)
         print('current frontier', frontier.queue)
         frontier.queue.remove(start)
         explored.add(start)
         print('explored', explored)
-        for neighbor in graph.neighbors(start):
+        for neighbor in graph.neighbors(start[1]):
             print('nei', neighbor)
             if neighbor not in explored and not frontier.__contains__(start):
                 if neighbor == goal:
                     return neighbor
-                frontier.append(neighbor)
+                frontier.append((random.randint(0, 10000), neighbor))
         start = frontier.top()
     return None
 
