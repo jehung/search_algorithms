@@ -55,7 +55,7 @@ class PriorityQueue(object):
         return popped
 
 
-    def remove(self, node_id):
+    def remove(self):
         """Remove the samllest node from the queue.
 
         This method can be used in ucs.
@@ -177,7 +177,7 @@ def breadth_first_search(graph, start, goal):
         print('explored', explored)
         for neighbor in graph.neighbors(start[1]):
             print('nei', neighbor)
-            if neighbor not in explored and not frontier.__contains__(start):
+            if neighbor not in explored and not frontier.__contains__(neighbor):
                 if neighbor == goal:
                     return neighbor
                 frontier.append((random.randint(0, len(frontier.queue)+1), neighbor))
@@ -205,19 +205,22 @@ def uniform_cost_search(graph, start, goal):
     explored = set()
     print('frontier.queue', frontier.queue)
     while frontier:
-        start = frontier.top()
-        print(start)
-        print('current frontier', frontier.queue)
-        frontier.queue.remove(start)
+        #start = frontier.top()
+        #print(start)
+        #print('current frontier', frontier.queue)
+        start = frontier.pop()
+        print('removed', start)
+        if start[1] == end:
+            return start[1]
         explored.add(start)
         print('explored', explored)
         for neighbor in graph.neighbors(start[1]):
             print('nei', neighbor)
-            if neighbor not in explored and not frontier.__contains__(start):
-                if neighbor == goal:
-                    return neighbor
-                frontier.append((random.randint(0, len(frontier.queue)+1), neighbor))
-        start = frontier.top()
+            if neighbor not in explored and not frontier.__contains__(neighbor):
+                frontier.append((random.randint(0, len(frontier.queue) + 1), neighbor))
+            elif frontier.__contains__(neighbor) and neighbor == frontier.top():
+                start = frontier.top()
+
     return None
 
 
@@ -374,3 +377,4 @@ print('start', start)
 print('end', end)
 
 bfs = breadth_first_search(graph, start, end)
+ucs = uniform_cost_search(graph, start, end)
