@@ -38,7 +38,7 @@ class PriorityQueue(object):
         """
 
         self.queue = []
-        self.min_value = 0
+        self.value = 0
 
 
     def pop(self):
@@ -165,8 +165,7 @@ def breadth_first_search(graph, start, goal):
     if start == goal:
         return []
     frontier = PriorityQueue()
-
-    frontier.append((random.randint(0, 10000), start))
+    frontier.append((random.randint(0, len(frontier.queue)+1), start))
     explored = set()
     print('frontier.queue', frontier.queue)
     while frontier:
@@ -181,13 +180,13 @@ def breadth_first_search(graph, start, goal):
             if neighbor not in explored and not frontier.__contains__(start):
                 if neighbor == goal:
                     return neighbor
-                frontier.append((random.randint(0, 10000), neighbor))
+                frontier.append((random.randint(0, len(frontier.queue)+1), neighbor))
         start = frontier.top()
     return None
 
 
 def uniform_cost_search(graph, start, goal):
-    """Warm-up exercise: Implement uniform_cost_search.
+    """Implement uniform_cost_search (i.e., ucs, cheapest-first).
 
     See README.md for exercise description.
 
@@ -199,9 +198,32 @@ def uniform_cost_search(graph, start, goal):
     Returns:
         The best path as a list from the start and goal nodes (including both).
     """
+    if start == goal:
+        return []
+    frontier = PriorityQueue()
+    frontier.append((random.randint(0, len(frontier.queue)+1), start))
+    explored = set()
+    print('frontier.queue', frontier.queue)
+    while frontier:
+        start = frontier.top()
+        print(start)
+        print('current frontier', frontier.queue)
+        frontier.queue.remove(start)
+        explored.add(start)
+        print('explored', explored)
+        for neighbor in graph.neighbors(start[1]):
+            print('nei', neighbor)
+            if neighbor not in explored and not frontier.__contains__(start):
+                if neighbor == goal:
+                    return neighbor
+                frontier.append((random.randint(0, len(frontier.queue)+1), neighbor))
+        start = frontier.top()
+    return None
 
-    # TODO: finish this function!
-    raise NotImplementedError
+
+
+
+
 
 
 def null_heuristic(graph, v, goal ):
