@@ -12,6 +12,7 @@ import pickle
 
 import os
 import random
+from math import sqrt
 import matplotlib.pyplot as plt
 import networkx as nx
 
@@ -221,10 +222,9 @@ def uniform_cost_search(graph, start, goal):
             return node
         explored.add(node[-1])
         for neighbor in graph.neighbors(node[-1]):
-            #cost += graph[node[-1]][neighbor]['weight']
             if neighbor not in explored and not frontier.__contains__(neighbor):
                 frontier.append((cost + graph[node[-1]][neighbor]['weight'], node+[neighbor]))
-            elif frontier.__contains__(neighbor) and (cost + graph[node[-1]][neighbor]['weight'], neighbor)s==frontier.queue[0]:
+            elif frontier.__contains__(neighbor) and (cost + graph[node[-1]][neighbor]['weight'], neighbor)==frontier.queue[0]:
                 node[-1] = neighbor
 
     return None
@@ -262,8 +262,7 @@ def euclidean_dist_heuristic(graph, v, goal):
     v_pos = graph.node[v]['pos']
     goal_pos = graph.node[goal]['pos']
     #print (v_pos[0]-goal_pos[0])**2 + (v_pos[1]-goal_pos[1])**2
-    return (v_pos[0]-goal_pos[0])**2 + (v_pos[1]-goal_pos[1])**2
-
+    return sqrt((v_pos[0]-goal_pos[0])**2 + (v_pos[1]-goal_pos[1])**2)
 
 
 def a_star(graph, start, goal, heuristic=euclidean_dist_heuristic):
@@ -281,36 +280,29 @@ def a_star(graph, start, goal, heuristic=euclidean_dist_heuristic):
     Returns:
         The best path as a list from the start and goal nodes (including both).
     """
-
     if start == goal:
         return []
     frontier = PriorityQueue()
-    #frontier.append((euclidean_dist_heuristic(graph, start, goal), start))
-    frontier.append((0, start))
+    print('ans', graph[start])
+    frontier.append((heuristic(graph, start, goal), [start]))
     explored = set()
     print('frontier.queue', frontier.queue)
     while frontier:
-        start = frontier.pop()
-        print('check', frontier.queue)
-        print('popped start', start)
-        print('before explored', explored)
-        if start[1] == end:
-            return start[1]
-        explored.add(start[1])
-        print('after explored', explored)
-        for neighbor in graph.neighbors(start[1]):
+        (cost, node) = frontier.pop()
+        print('now', (cost, node))
+        if node[-1] == goal:
+            return node
+        explored.add(node[-1])
+        for neighbor in graph.neighbors(node[-1]):
+            #print('dist r-c', heuristic(graph, 'r', 'c'))
+            #print('dist t-p + p-c', heuristic(graph, 'r', 'p')+heuristic(graph, 'p', 'c'))
+            #cost += graph[node[-1]][neighbor]['weight']##+heuristic(graph, neighbor, goal)
             if neighbor not in explored and not frontier.__contains__(neighbor):
-                #print('here', neighbor)
-                #print('iam here', [n for _, n in frontier.queue])
-                #frontier.append(((euclidean_dist_heuristic(graph, start[1], goal), neighbor)))
-                frontier.append((0, neighbor))
-                print('a step', neighbor)
-            elif frontier.__contains__(neighbor) and neighbor != frontier.queue[0]:
-                #frontier.append((euclidean_dist_heuristic((graph, start[1], goal)), neighbor))
-                #start = ((euclidean_dist_heuristic(graph, start[1], goal), neighbor))
-                start = (0, neighbor)
-                print('b step', neighbor)
-
+                frontier.append((cost+graph[node[-1]][neighbor]['weight'], node + [neighbor]))
+            elif frontier.__contains__(neighbor) and (cost+graph[node[-1]][neighbor]['weight'], neighbor) == \
+                    frontier.queue[0]:
+                node[-1] = neighbor
+    return None
 
 
 def bidirectional_ucs(graph, start, goal, heuristic=euclidean_dist_heuristic):
@@ -412,8 +404,8 @@ print('end', end)
 
 
 #bfs = breadth_first_search(graph, start, end)
-ucs = uniform_cost_search(graph, start, end)
-print(ucs)
+#ucs = uniform_cost_search(graph, start, end)
+
 
 
 
