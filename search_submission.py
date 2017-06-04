@@ -211,28 +211,21 @@ def uniform_cost_search(graph, start, goal):
     if start == goal:
         return []
     frontier = PriorityQueue()
-    frontier.append((random.randint(0, len(frontier.queue)+1), start))
+    print('ans', graph[start])
+    frontier.append((0, [start]))
     explored = set()
     print('frontier.queue', frontier.queue)
     while frontier:
-        start = frontier.pop()
-        print('check', frontier.queue)
-        print('popped start', start)
-        print('before explored', explored)
-        if start[1] == end:
-            return start[1]
-        explored.add(start[1])
-        print('after explored', explored)
-        for neighbor in graph.neighbors(start[1]):
+        (cost, node) = frontier.pop()
+        if node[-1] == goal:
+            return node
+        explored.add(node[-1])
+        for neighbor in graph.neighbors(node[-1]):
+            #cost += graph[node[-1]][neighbor]['weight']
             if neighbor not in explored and not frontier.__contains__(neighbor):
-                #print('here', neighbor)
-                #print('iam here', [n for _, n in frontier.queue])
-                frontier.append((random.randint(0, len(frontier.queue)+1), neighbor))
-                print('a step', neighbor)
-            elif frontier.__contains__(neighbor) and neighbor != frontier.queue[0]:
-                #frontier.append((euclidean_dist_heuristic((graph, start[1], goal)), neighbor))
-                start = (random.randint(0, len(frontier.queue)+1), neighbor)
-                print('b step', neighbor)
+                frontier.append((cost + graph[node[-1]][neighbor]['weight'], node+[neighbor]))
+            elif frontier.__contains__(neighbor) and (cost + graph[node[-1]][neighbor]['weight'], neighbor)s==frontier.queue[0]:
+                node[-1] = neighbor
 
     return None
 
@@ -408,6 +401,8 @@ print('here', graph.nodes())
 
 start = random.choice(graph.nodes())
 end = random.choice(graph.nodes())
+start = 'a'
+end = 'c'
 #start_num = random.randint(0, len(graph.nodes()))
 #end_num = random.randint(0, len(graph.nodes()))
 #start = graph.node[graph.nodes()[start_num]]
@@ -416,9 +411,9 @@ print('start', start)
 print('end', end)
 
 
-bfs = breadth_first_search(graph, start, end)
-#print('path', bfs)
-#ucs = uniform_cost_search(graph, start, end)
+#bfs = breadth_first_search(graph, start, end)
+ucs = uniform_cost_search(graph, start, end)
+print(ucs)
 
 
 
