@@ -170,19 +170,19 @@ def breadth_first_search(graph, start, goal):
     explored = set()
     print('frontier.queue', frontier.queue)
     while frontier:
-        start = frontier.top()
+        start = frontier.pop()
         print(start)
         print('current frontier', frontier.queue)
-        frontier.queue.remove(start)
+        #frontier.queue.remove(start)
         explored.add(start)
         print('explored', explored)
         for neighbor in graph.neighbors(start[1]):
             print('nei', neighbor)
             if neighbor not in explored or not frontier.__contains__(neighbor):
                 if neighbor == goal:
-                    path.append(neighbor)
-                    return path
-                frontier.append((random.randint(0, len(frontier.queue)+1), neighbor))
+                    return neighbor
+                else:
+                    frontier.append((random.randint(0, len(frontier.queue)+1), neighbor))
     return None
 
 
