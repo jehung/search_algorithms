@@ -162,31 +162,21 @@ def breadth_first_search(graph, start, goal):
 
     Note: recall that BFS guarantees finding the shortest path, not the cheapest path
     """
-    #path = []
     depth = 1
     if start == goal:
         return []
-    frontier = PriorityQueue()
-    frontier.append((depth, start))
-    #path.append(start)
-    explored = set()
-    print('frontier.queue', frontier.queue)
+    frontier = [([start], start)]
+    print('frontier.queue', frontier)
     while frontier:
-        print('current frontier', frontier.queue)
-        start = frontier.pop()
-        print(start)
-        explored.add(start[1])
-        #path.append(start[1])
-        #depth = 1
-        print('explored', explored)
-        for neighbor in graph.neighbors(start[1]):
-            #print('nei', neighbor)
-            if neighbor not in explored and not frontier.__contains__(neighbor):
+        (path, node) = frontier.pop(0)
+        print(path, node)
+        print(graph.neighbors(node))
+        for neighbor in graph.neighbors(node):
+            if neighbor not in path:
                 if neighbor == goal:
-                    return neighbor
+                    return path + [neighbor]
                 else:
-                    frontier.append((depth, neighbor))
-                    print('nei', neighbor)
+                    frontier.append((path+[neighbor], neighbor))
     return None
 
 
@@ -406,6 +396,7 @@ def custom_search(graph, start, goal, data=None):
 
     # TODO: finish this function!
     raise NotImplementedError
+
 
 
 # 'graph' is a graph object
