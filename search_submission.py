@@ -148,7 +148,7 @@ s
 
 
 def breadth_first_search(graph, start, goal):
-    """Warm-up exercise: Implement breadth-first-search.
+    """Implement breadth-first-search.
 
     See README.md for exercise description.
 
@@ -162,27 +162,31 @@ def breadth_first_search(graph, start, goal):
 
     Note: recall that BFS guarantees finding the shortest path, not the cheapest path
     """
-    path = []
+    #path = []
+    depth = 1
     if start == goal:
-        return path
+        return []
     frontier = PriorityQueue()
-    frontier.append((random.randint(0, len(frontier.queue)+1), start))
+    frontier.append((depth, start))
+    #path.append(start)
     explored = set()
     print('frontier.queue', frontier.queue)
     while frontier:
+        print('current frontier', frontier.queue)
         start = frontier.pop()
         print(start)
-        print('current frontier', frontier.queue)
-        #frontier.queue.remove(start)
-        explored.add(start)
+        explored.add(start[1])
+        #path.append(start[1])
+        #depth = 1
         print('explored', explored)
         for neighbor in graph.neighbors(start[1]):
-            print('nei', neighbor)
-            if neighbor not in explored or not frontier.__contains__(neighbor):
+            #print('nei', neighbor)
+            if neighbor not in explored and not frontier.__contains__(neighbor):
                 if neighbor == goal:
                     return neighbor
                 else:
-                    frontier.append((random.randint(0, len(frontier.queue)+1), neighbor))
+                    frontier.append((depth, neighbor))
+                    print('nei', neighbor)
     return None
 
 
@@ -422,7 +426,7 @@ print('end', end)
 
 
 bfs = breadth_first_search(graph, start, end)
-print('path', bfs)
+#print('path', bfs)
 #ucs = uniform_cost_search(graph, start, end)
 
 
