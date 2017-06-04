@@ -104,7 +104,7 @@ class PriorityQueue(object):
             True if key is found in queue, False otherwise.
         """
 
-        return key in [n for n in self.queue]
+        return key in [n for _, n in self.queue]
 
 
     def __eq__(self, other):
@@ -162,8 +162,9 @@ def breadth_first_search(graph, start, goal):
 
     Note: recall that BFS guarantees finding the shortest path, not the cheapest path
     """
+    path = []
     if start == goal:
-        return []
+        return path
     frontier = PriorityQueue()
     frontier.append((random.randint(0, len(frontier.queue)+1), start))
     explored = set()
@@ -177,12 +178,27 @@ def breadth_first_search(graph, start, goal):
         print('explored', explored)
         for neighbor in graph.neighbors(start[1]):
             print('nei', neighbor)
-            if neighbor not in explored and not frontier.__contains__(neighbor):
+            if neighbor not in explored or not frontier.__contains__(neighbor):
                 if neighbor == goal:
-                    return neighbor
+                    path.append(neighbor)
+                    return path
                 frontier.append((random.randint(0, len(frontier.queue)+1), neighbor))
-        start = frontier.top()
     return None
+
+
+def null_heuristic(graph, v, goal):
+    """Null heuristic used as a base line.
+
+    Args:
+        graph (explorable_graph): Undirected graph to search.
+        v (str): Key for the node to calculate from.
+        goal (str): Key for the end node to calculate to.
+
+    Returns:
+        0
+    """
+
+    return 0
 
 
 def uniform_cost_search(graph, start, goal):
@@ -205,31 +221,30 @@ def uniform_cost_search(graph, start, goal):
     explored = set()
     print('frontier.queue', frontier.queue)
     while frontier:
-        #start = frontier.top()
-        #print(start)
-        #print('current frontier', frontier.queue)
         start = frontier.pop()
-        print('removed', start)
+        print('check', frontier.queue)
+        print('popped start', start)
+        print('before explored', explored)
         if start[1] == end:
             return start[1]
-        explored.add(start)
-        print('explored', explored)
+        explored.add(start[1])
+        print('after explored', explored)
         for neighbor in graph.neighbors(start[1]):
-            print('nei', neighbor)
             if neighbor not in explored and not frontier.__contains__(neighbor):
-                frontier.append((random.randint(0, len(frontier.queue) + 1), neighbor))
-            elif frontier.__contains__(neighbor) and neighbor == frontier.top():
-                start = frontier.top()
+                #print('here', neighbor)
+                #print('iam here', [n for _, n in frontier.queue])
+                frontier.append((random.randint(0, len(frontier.queue)+1), neighbor))
+                print('a step', neighbor)
+            elif frontier.__contains__(neighbor) and neighbor != frontier.queue[0]:
+                #frontier.append((euclidean_dist_heuristic((graph, start[1], goal)), neighbor))
+                start = (random.randint(0, len(frontier.queue)+1), neighbor)
+                print('b step', neighbor)
 
     return None
 
 
 
-
-
-
-
-def null_heuristic(graph, v, goal ):
+def null_heuristic(graph, v, goal):
     """Null heuristic used as a base line.
 
     Args:
@@ -245,9 +260,9 @@ def null_heuristic(graph, v, goal ):
 
 
 def euclidean_dist_heuristic(graph, v, goal):
-    """Warm-up exercise: Implement the euclidean distance heuristic.
+    """Implement the euclidean distance heuristic.
 
-    See README.md for exercise description.
+    See README.md for description.
 
     Args:
         graph (explorable_graph): Undirected graph to search.
@@ -257,29 +272,58 @@ def euclidean_dist_heuristic(graph, v, goal):
     Returns:
         Euclidean distance between `v` node and `goal` node as a list.
     """
+    v_pos = graph.node[v]['pos']
+    goal_pos = graph.node[goal]['pos']
+    #print (v_pos[0]-goal_pos[0])**2 + (v_pos[1]-goal_pos[1])**2
+    return (v_pos[0]-goal_pos[0])**2 + (v_pos[1]-goal_pos[1])**2
 
-    # TODO: finish this function!
-    raise NotImplementedError
 
 
 def a_star(graph, start, goal, heuristic=euclidean_dist_heuristic):
-    """ Warm-up exercise: Implement A* algorithm.
+    """ Implement A* algorithm.
 
-    See README.md for exercise description.
+    See README.md for description.
 
     Args:
         graph (explorable_graph): Undirected graph to search.
         start (str): Key for the start node.
         goal (str): Key for the end node.
-        heuristic: Function to determine distance heuristic.
+        heuristic: callable, a function to determine distance heuristic.
             Default: euclidean_dist_heuristic.
 
     Returns:
         The best path as a list from the start and goal nodes (including both).
     """
 
-    # TODO: finish this function!
-    raise NotImplementedError
+    if start == goal:
+        return []
+    frontier = PriorityQueue()
+    #frontier.append((euclidean_dist_heuristic(graph, start, goal), start))
+    frontier.append((0, start))
+    explored = set()
+    print('frontier.queue', frontier.queue)
+    while frontier:
+        start = frontier.pop()
+        print('check', frontier.queue)
+        print('popped start', start)
+        print('before explored', explored)
+        if start[1] == end:
+            return start[1]
+        explored.add(start[1])
+        print('after explored', explored)
+        for neighbor in graph.neighbors(start[1]):
+            if neighbor not in explored and not frontier.__contains__(neighbor):
+                #print('here', neighbor)
+                #print('iam here', [n for _, n in frontier.queue])
+                #frontier.append(((euclidean_dist_heuristic(graph, start[1], goal), neighbor)))
+                frontier.append((0, neighbor))
+                print('a step', neighbor)
+            elif frontier.__contains__(neighbor) and neighbor != frontier.queue[0]:
+                #frontier.append((euclidean_dist_heuristic((graph, start[1], goal)), neighbor))
+                #start = ((euclidean_dist_heuristic(graph, start[1], goal), neighbor))
+                start = (0, neighbor)
+                print('b step', neighbor)
+
 
 
 def bidirectional_ucs(graph, start, goal, heuristic=euclidean_dist_heuristic):
@@ -376,5 +420,13 @@ end = random.choice(graph.nodes())
 print('start', start)
 print('end', end)
 
+
 bfs = breadth_first_search(graph, start, end)
-ucs = uniform_cost_search(graph, start, end)
+print('path', bfs)
+#ucs = uniform_cost_search(graph, start, end)
+
+
+
+#euclidean_dist_heuristic(graph, start, end)
+#a_star = a_star(graph, start, end)
+#print(a_star)
