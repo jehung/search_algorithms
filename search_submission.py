@@ -306,7 +306,7 @@ def a_star(graph, start, goal, heuristic=euclidean_dist_heuristic):
 
 
 def bidirectional_ucs(graph, start, goal, heuristic=euclidean_dist_heuristic):
-    """Exercise 1: Bidirectional Search.
+    """Bidirectional Search.
 
     See README.md for exercise description.
 
@@ -318,9 +318,45 @@ def bidirectional_ucs(graph, start, goal, heuristic=euclidean_dist_heuristic):
     Returns:
         The best path as a list from the start and goal nodes (including both).
     """
+    if start == goal:
+        return []
+    frontier_start = PriorityQueue()
+    frontier_goal = PriorityQueue()
+    frontier_start.append((heuristic(graph, start, goal), [start]))
+    frontier_goal.append((heuristic(graph, goal, start), [goal]))
+    explored_start = set()
+    explored_goal = set()
+    while frontier_start and frontier_goal:
+        (cost_start, node_start) = frontier_start.pop()
+        print('now', (cost_start, node_start))
+        if frontier_goal.__contains__(node_start[-1]) or node_start[-1]==goal:
+            return node_start
+        explored_start.add(node_start[-1])
+        for neighbor_start in graph.neighbors(node_start[-1]):
+            if neighbor_start not in explored_start and not frontier_start.__contains__(neighbor_start):
+                frontier_start.append((cost_start+graph[node_start[-1]][neighbor_start]['weight'], node_start + [neighbor_start]))
+            elif frontier_start.__contains__(neighbor_start) and (cost_start+graph[node_start[-1]][neighbor_start]['weight'], neighbor_start) == \
+                    frontier.queue[0]:
+                node[-1] = neighbor_start
 
-    # TODO: finish this function!
-    raise NotImplementedError
+
+        (cost_goal, node_goal) = frontier_goal.pop()
+        print('now', (cost_goal, node_goal))
+        if frontier_start.__contains__(node_goal[-1]) or node_goal[-1]==start:
+            return node_goal
+        explored_goal.add(node_goal[-1])
+        for neighbor_goal in graph.neighbors(node_goal[-1]):
+            if neighbor_goal not in explored_goal and not frontier_goal.__contains__(neighbor_goal):
+                frontier_goal.append(
+                    (cost_goal + graph[node_goal[-1]][neighbor_goal]['weight'], node_goal + [neighbor_goal]))
+            elif frontier_start.__contains__(neighbor_start) and (
+                cost_start + graph[node_start[-1]][neighbor_goal]['weight'], neighbor_goal) == \
+                    frontier.queue[0]:
+                node[-1] = neighbor_goal
+
+    return None
+
+
 
 
 def bidirectional_a_star(graph, start, goal, heuristic=euclidean_dist_heuristic):
@@ -412,3 +448,6 @@ print('end', end)
 #euclidean_dist_heuristic(graph, start, end)
 #a_star = a_star(graph, start, end)
 #print(a_star)
+
+#bi_ucs = bidirectional_ucs(graph, start, end)
+#print(bi_ucs)
