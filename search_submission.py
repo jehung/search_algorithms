@@ -9,12 +9,10 @@ from __future__ import division
 
 import heapq
 import pickle
-
 import os
-import random
 from math import sqrt
-import matplotlib.pyplot as plt
-import networkx as nx
+
+
 
 class PriorityQueue(object):
     """A queue structure where each element is served in order of priority.
@@ -215,7 +213,6 @@ def uniform_cost_search(graph, start, goal):
 
     frontier.append((0, [start]))
     explored = set()
-    print('frontier.queue', frontier.queue)
     while frontier:
         (cost, node) = frontier.pop()
         if node[-1] == goal:
@@ -283,23 +280,22 @@ def a_star(graph, start, goal, heuristic=euclidean_dist_heuristic):
     if start == goal:
         return []
     frontier = PriorityQueue()
-    print('ans', graph[start])
     frontier.append((heuristic(graph, start, goal), [start]))
     explored = set()
-    print('frontier.queue', frontier.queue)
     while frontier:
         (cost, node) = frontier.pop()
-        print('now', (cost, node))
+        #print('now', (cost, node))
         if node[-1] == goal:
             return node
         explored.add(node[-1])
+        #print('explored', explored)
         for neighbor in graph.neighbors(node[-1]):
             #print('dist r-c', heuristic(graph, 'r', 'c'))
             #print('dist t-p + p-c', heuristic(graph, 'r', 'p')+heuristic(graph, 'p', 'c'))
             #cost += graph[node[-1]][neighbor]['weight']##+heuristic(graph, neighbor, goal)
             if neighbor not in explored and not frontier.__contains__(neighbor):
                 frontier.append((cost+graph[node[-1]][neighbor]['weight'], node + [neighbor]))
-            elif frontier.__contains__(neighbor) and (cost+graph[node[-1]][neighbor]['weight'], neighbor) == \
+            elif frontier.__contains__(neighbor) and (cost+graph[node[-1]][neighbor]['weight']+heuristic(graph, neighbor, goal), neighbor) == \
                     frontier.queue[0]:
                 node[-1] = neighbor
     return None
@@ -365,7 +361,7 @@ def bidirectional_ucs(graph, start, goal, heuristic=euclidean_dist_heuristic):
 
 
 def bidirectional_a_star(graph, start, goal, heuristic=euclidean_dist_heuristic):
-    """Exercise 2: Bidirectional A*.
+    """Bidirectional A*.
 
     See README.md for exercise description.
 
@@ -379,9 +375,42 @@ def bidirectional_a_star(graph, start, goal, heuristic=euclidean_dist_heuristic)
     Returns:
         The best path as a list from the start and goal nodes (including both).
     """
+    if start == goal:
+        return []
+    frontier_start = PriorityQueue()
+    frontier_goal = PriorityQueue()
+    frontier_start.append((heuristic(graph, start, goal), [start]))
+    frontier_goal.append((heuristic(graph, goal, start), [goal]))
+    explored_start = set()
+    explored_goal = set()
+    while frontier_start and frontier_goal:
+        (cost_start, node_start) = frontier_start.pop()
+        (cost_goal, node_goal) = frontier_goal.pop()
+        if frontier_goal.__contains__(node_start[-1]) or node_start[-1]==goal:
+            return node_start
+        if frontier_start.__contains__(node_goal[-1]) or node_goal[-1]==start:
+            return node_goal[::-1]
+        explored_start.add(node_start[-1])
+        explored_goal.add(node_goal[-1])
+        for neighbor_start in graph.neighbors(node_start[-1]):
+            if neighbor_start not in explored_start and not frontier_start.__contains__(neighbor_start):
+                frontier_start.append((cost_start+graph[node_start[-1]][neighbor_start]['weight'], node_start + [neighbor_start]))
+            elif frontier_start.__contains__(neighbor_start) and (cost_start+graph[node_start[-1]][neighbor_start]['weight'], neighbor_start) == \
+                    frontier_start.queue[0]:
+                node_start[-1] = neighbor_start
+        for neighbor_goal in graph.neighbors(node_goal[-1]):
+            if neighbor_goal not in explored_goal and not frontier_goal.__contains__(neighbor_goal):
+                frontier_goal.append((cost_goal+graph[node_goal[-1]][neighbor_goal]['weight'], node_goal + [neighbor_goal]))
+            elif frontier_goal.__contains__(neighbor_goal) and (cost_goal+graph[node_goal[-1]][neighbor_goal]['weight'], neighbor_goal) == \
+                    frontier_goal.queue[0]:
+                node_goal[-1] = neighbor_goal
+    return None
 
-    # TODO: finish this function!
-    raise NotImplementedError
+
+
+
+
+
 
 
 # Extra Credit: Your best search method for the race
@@ -426,16 +455,16 @@ def custom_search(graph, start, goal, data=None):
 
 
 #'graph' is a graph object
-graph = load_data('romania_graph.pickle')
-print(graph.adj)
-nx.draw(graph)
-plt.show()
-print('here', graph.nodes())
+#graph = load_data('romania_graph.pickle')
+#print(graph.adj)
+#nx.draw(graph)
+#plt.show()
+
 
 #start = random.choice(graph.nodes())
-#end = rsandom.choice(graph.nodes())
-start = 'b'
-end = 'e'
+#end = random.choice(graph.nodes())
+#start = 'b'
+#end = 'e'
 #start_num = random.randint(0, len(graph.nodes()))
 #end_num = random.randint(0, len(graph.nodes()))
 #start = graph.node[graph.nodes()[start_num]]
@@ -455,5 +484,7 @@ end = 'e'
 #print(a_star)
 
 
-bi_ucs = bidirectional_ucs(graph, start, end)
-print(bi_ucs)
+#ucs = uniform_cost_search(graph, start, end)
+#print(bi_ucs)
+#bia = bidirectional_a_star(graph, start, end)
+#print(bia)
