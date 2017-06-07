@@ -428,28 +428,30 @@ def bidirectional_a_star(graph, start, goal, heuristic=euclidean_dist_heuristic)
         for neighbor_start in graph.neighbors(node_start[-1]):
             print('nei start', neighbor_start)
             print('explored_start', explored_start)
+            d = heuristic(graph, neighbor_start, goal) - heuristic(graph, node_start[-1], goal)
             found_in_frontier_start = frontier_start.find(neighbor_start)
             if neighbor_start not in explored_start and found_in_frontier_start is None:
-                frontier_start.append((cost_start+graph[node_start[-1]][neighbor_start]['weight'], node_start+[neighbor_start]))
+                frontier_start.append((cost_start+graph[node_start[-1]][neighbor_start]['weight']+d, node_start+[neighbor_start]))
                 print('queue part a start', frontier_start.queue)
             elif found_in_frontier_start is not None:
                 print('queue part b start', frontier_start)
                 frontier_start.remove(found_in_frontier_start)
-                frontier_start.append((cost_start + graph[node_start[-1]][neighbor_start]['weight'], node_start + [neighbor_start]))
+                frontier_start.append((cost_start + graph[node_start[-1]][neighbor_start]['weight']+d, node_start + [neighbor_start]))
                 print('part b', frontier_start.queue)
                 #and (cost_start+graph[node_start[-1]][neighbor_start]['weight'], neighbor_start)==frontier_start.queue[0]:
                 #node_start[-1] = neighbor_start
         for neighbor_goal in graph.neighbors(node_goal[-1]):
             print('nei goal', neighbor_goal)
             print('explored_goal', explored_goal)
+            d = heuristic(graph, neighbor_goal, start) - heuristic(graph, node_goal[-1], start)
             found_in_frontier_goal = frontier_goal.find(neighbor_goal)
             if neighbor_goal not in explored_goal and found_in_frontier_goal is None:
-                frontier_goal.append((cost_goal+graph[node_goal[-1]][neighbor_goal]['weight'], node_goal+[neighbor_goal]))
+                frontier_goal.append((cost_goal+graph[node_goal[-1]][neighbor_goal]['weight']+d, node_goal+[neighbor_goal]))
                 print('queue part a start', frontier_start.queue)
             elif found_in_frontier_goal is not None:
                 #frontier_start.__contains__(neighbor_start):
                 frontier_goal.remove(found_in_frontier_goal)
-                frontier_goal.append((cost_goal + graph[node_goal[-1]][neighbor_goal]['weight'], node_goal + [neighbor_goal]))
+                frontier_goal.append((cost_goal + graph[node_goal[-1]][neighbor_goal]['weight']+d, node_goal + [neighbor_goal]))
                 print('queue part b goal', frontier_goal.queue)
 
 
